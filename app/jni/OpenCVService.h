@@ -12,16 +12,15 @@ using namespace std;
 #ifdef __cplusplus
 extern "C" {
 #endif
-/*
- * Class:     com_xqs_cvdemo_OpenCVService
- * Method:    convertGray
- * Signature: (JJ)I
- */
+
 
 int toGray(Mat img,Mat& gray);
 
 JNIEXPORT jint JNICALL Java_com_xqs_cvdemo_OpenCVService_convertGray
   (JNIEnv *, jclass, jlong, jlong);
+
+JNIEXPORT jbyteArray JNICALL Java_com_xqs_cvdemo_OpenCVService_rotateImg
+        (JNIEnv *, jclass, jbyteArray, jint, jint);
 
 #ifdef __cplusplus
 }

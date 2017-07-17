@@ -25,4 +25,11 @@
         android:text="Test02Activity"
         />
 
+    <Button
+        android:id="@+id/btn_04"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Test03Activity"
+        />
+
 </LinearLayout>

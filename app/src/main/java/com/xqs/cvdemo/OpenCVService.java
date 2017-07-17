@@ -9,4 +9,6 @@ package com.xqs.cvdemo;
 public class OpenCVService {
 
     public native static int convertGray(long mRgbaAddr,long mGrayAddr);
+
+    public native static byte[] rotateImg(byte[] data, int width, int height);
 }
