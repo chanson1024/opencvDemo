@@ -74,11 +74,11 @@ public class Test02Activity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test02);
-        ivImage = (ImageView)findViewById(R.id.ivImage);
+        ivImage = (ImageView) findViewById(R.id.ivImage);
         Button bClickImage, bLoadImage;
 
-        bClickImage = (Button)findViewById(R.id.bClickImage);
-        bLoadImage = (Button)findViewById(R.id.bLoadImage);
+        bClickImage = (Button) findViewById(R.id.bClickImage);
+        bLoadImage = (Button) findViewById(R.id.bLoadImage);
         // bDone = (Button)findViewById(R.id.bDone);
 
         bClickImage.setOnClickListener(new View.OnClickListener() {
@@ -115,9 +115,9 @@ public class Test02Activity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("LensActivity", requestCode + " " + CLICK_PHOTO + " " + resultCode + " " + RESULT_OK);
 
-        switch(requestCode) {
+        switch (requestCode) {
             case CLICK_PHOTO:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     try {
                         Log.d("LensActivity", fileUri.toString());
                         final InputStream imageStream = getContentResolver().openInputStream(fileUri);
@@ -128,7 +128,7 @@ public class Test02Activity extends Activity {
 
                         scaleFactor = calcScaleFactor(srcOrig.rows(), srcOrig.cols());
 
-                        Imgproc.resize(srcOrig, src, new Size(srcOrig.rows()/scaleFactor, srcOrig.cols()/scaleFactor));
+                        Imgproc.resize(srcOrig, src, new Size(srcOrig.rows() / scaleFactor, srcOrig.cols() / scaleFactor));
                         getPage();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -136,7 +136,7 @@ public class Test02Activity extends Activity {
                 }
                 break;
             case LOAD_PHOTO:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     try {
                         InputStream stream = getContentResolver().openInputStream(data.getData());
                         final Bitmap selectedImage = BitmapFactory.decodeStream(stream);
@@ -146,8 +146,8 @@ public class Test02Activity extends Activity {
                         Utils.bitmapToMat(selectedImage, srcOrig);
                         scaleFactor = calcScaleFactor(srcOrig.rows(), srcOrig.cols());
                         src = new Mat();
-                        Imgproc.resize(srcOrig, src, new Size(srcOrig.rows()/scaleFactor, srcOrig.cols()/scaleFactor));
-                        Imgproc.GaussianBlur(src, src, new Size(5,5), 1);
+                        Imgproc.resize(srcOrig, src, new Size(srcOrig.rows() / scaleFactor, srcOrig.cols() / scaleFactor));
+                        Imgproc.GaussianBlur(src, src, new Size(5, 5), 1);
                         getPage();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -159,10 +159,11 @@ public class Test02Activity extends Activity {
         }
     }
 
-    private void getPage(){
+    private void getPage() {
 
         new AsyncTask<Void, Void, Bitmap>() {
             ProgressDialog dialog;
+
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -172,14 +173,14 @@ public class Test02Activity extends Activity {
             @Override
             protected Bitmap doInBackground(Void... params) {
 
-                Mat srcRes = new Mat( src.size(), src.type() );
+                Mat srcRes = new Mat(src.size(), src.type());
                 Mat srcGray = new Mat();
 
                 Mat samples = new Mat(src.rows() * src.cols(), 3, CvType.CV_32F);
-                for( int y = 0; y < src.rows(); y++ ) {
-                    for( int x = 0; x < src.cols(); x++ ) {
-                        for( int z = 0; z < 3; z++) {
-                            samples.put(x + y*src.cols(), z, src.get(y,x)[z]);
+                for (int y = 0; y < src.rows(); y++) {
+                    for (int x = 0; x < src.cols(); x++) {
+                        for (int z = 0; z < 3; z++) {
+                            samples.put(x + y * src.cols(), z, src.get(y, x)[z]);
                         }
                     }
                 }
@@ -194,19 +195,18 @@ public class Test02Activity extends Activity {
                 double dstCenter0 = calcWhiteDist(centers.get(0, 0)[0], centers.get(0, 1)[0], centers.get(0, 2)[0]);
                 double dstCenter1 = calcWhiteDist(centers.get(1, 0)[0], centers.get(1, 1)[0], centers.get(1, 2)[0]);
 
-                int paperCluster = (dstCenter0 < dstCenter1)?0:1;
+                int paperCluster = (dstCenter0 < dstCenter1) ? 0 : 1;
 //
 //                double[] black = {0, 0, 0};
 //                double[] white = {255, 255, 255};
 
-                for( int y = 0; y < src.rows(); y++ ) {
-                    for( int x = 0; x < src.cols(); x++ )
-                    {
-                        int cluster_idx = (int)labels.get(x + y*src.cols(),0)[0];
-                        if(cluster_idx != paperCluster){
-                            srcRes.put(y,x, 0, 0, 0, 255);
+                for (int y = 0; y < src.rows(); y++) {
+                    for (int x = 0; x < src.cols(); x++) {
+                        int cluster_idx = (int) labels.get(x + y * src.cols(), 0)[0];
+                        if (cluster_idx != paperCluster) {
+                            srcRes.put(y, x, 0, 0, 0, 255);
                         } else {
-                            srcRes.put(y,x, 255, 255, 255, 255);
+                            srcRes.put(y, x, 255, 255, 255, 255);
                         }
                     }
                 }
@@ -237,11 +237,10 @@ public class Test02Activity extends Activity {
 
                 for (int contourIdx = 1; contourIdx < contours.size(); contourIdx++) {
                     double temp;
-                    temp=Imgproc.contourArea(contours.get(contourIdx));
-                    if(maxim<temp)
-                    {
-                        maxim=temp;
-                        index=contourIdx;
+                    temp = Imgproc.contourArea(contours.get(contourIdx));
+                    if (maxim < temp) {
+                        maxim = temp;
+                        index = contourIdx;
                     }
                 }
 
@@ -249,27 +248,26 @@ public class Test02Activity extends Activity {
                 Imgproc.drawContours(drawing, contours, index, new Scalar(255), 1);
 
                 Mat lines = new Mat();
-                Imgproc.HoughLinesP(drawing, lines, 1, Math.PI/180, 70, 30, 10);
+                Imgproc.HoughLinesP(drawing, lines, 1, Math.PI / 180, 70, 30, 10);
 
                 ArrayList<Point> corners = new ArrayList<Point>();
-                for (int i = 0; i < lines.cols(); i++)
-                {
-                    for (int j = i+1; j < lines.cols(); j++) {
+                for (int i = 0; i < lines.cols(); i++) {
+                    for (int j = i + 1; j < lines.cols(); j++) {
                         double[] line1 = lines.get(0, i);
                         double[] line2 = lines.get(0, j);
 
                         Point pt = findIntersection(line1, line2);
-                        Log.d("com.packtpub.chapter10", pt.x+" "+pt.y);
-                        if (pt.x >= 0 && pt.y >= 0 && pt.x <= drawing.cols() && pt.y <= drawing.rows()){
-                            if(!exists(corners, pt)){
+                        Log.d("com.packtpub.chapter10", pt.x + " " + pt.y);
+                        if (pt.x >= 0 && pt.y >= 0 && pt.x <= drawing.cols() && pt.y <= drawing.rows()) {
+                            if (!exists(corners, pt)) {
                                 corners.add(pt);
                             }
                         }
                     }
                 }
 
-                if(corners.size() != 4){
-                    errorMsg =  "Cannot detect perfect corners";
+                if (corners.size() != 4) {
+                    errorMsg = "Cannot detect perfect corners";
                     Bitmap bitmap = Bitmap.createBitmap(drawing.cols(), drawing.rows(), Bitmap.Config.ARGB_8888);
                     Utils.matToBitmap(drawing, bitmap);
 
@@ -279,7 +277,7 @@ public class Test02Activity extends Activity {
 
                 sortCorners(corners);
 
-                if(corners.size() == 0){
+                if (corners.size() == 0) {
                     errorMsg = "Cannot sort corners";
                     return null;
                 }
@@ -301,7 +299,7 @@ public class Test02Activity extends Activity {
                 Mat cornerPts = Converters.vector_Point2f_to_Mat(corners);
                 Mat resultPts = Converters.vector_Point2f_to_Mat(result_pts);
 
-                Log.d("com.packtpub.chapter10", cornerPts.checkVector(2, CvType.CV_32F)+" "+resultPts.checkVector(2, CvType.CV_32F)+" "+CvType.CV_32F+" "+cornerPts.type());
+                Log.d("com.packtpub.chapter10", cornerPts.checkVector(2, CvType.CV_32F) + " " + resultPts.checkVector(2, CvType.CV_32F) + " " + CvType.CV_32F + " " + cornerPts.type());
 
                 Mat transformation = Imgproc.getPerspectiveTransform(cornerPts, resultPts);
                 Imgproc.warpPerspective(srcOrig, quad, transformation, quad.size());
@@ -316,9 +314,9 @@ public class Test02Activity extends Activity {
             protected void onPostExecute(Bitmap bitmap) {
                 super.onPostExecute(bitmap);
                 dialog.dismiss();
-                if(bitmap!=null) {
+                if (bitmap != null) {
                     ivImage.setImageBitmap(bitmap);
-                } else if (errorMsg != null){
+                } else if (errorMsg != null) {
                     Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -328,16 +326,16 @@ public class Test02Activity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(OpenCVLoader.initDebug()){
-            Log.w(TAG,"opencv loaded successfully");
+        if (OpenCVLoader.initDebug()) {
+            Log.w(TAG, "opencv loaded successfully");
             mOpenCVCallBack.onManagerConnected(BaseLoaderCallback.SUCCESS);
-        }else{
-            Log.w(TAG,"opencv not loaded");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0,this,mOpenCVCallBack);
+        } else {
+            Log.w(TAG, "opencv not loaded");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mOpenCVCallBack);
         }
     }
 
-    static double calcWhiteDist(double r, double g, double b){
+    static double calcWhiteDist(double r, double g, double b) {
         return Math.sqrt(Math.pow(255 - r, 2) + Math.pow(255 - g, 2) + Math.pow(255 - b, 2));
     }
 
@@ -345,28 +343,25 @@ public class Test02Activity extends Activity {
         double start_x1 = line1[0], start_y1 = line1[1], end_x1 = line1[2], end_y1 = line1[3], start_x2 = line2[0], start_y2 = line2[1], end_x2 = line2[2], end_y2 = line2[3];
         double denominator = ((start_x1 - end_x1) * (start_y2 - end_y2)) - ((start_y1 - end_y1) * (start_x2 - end_x2));
 
-        if (denominator!=0)
-        {
+        if (denominator != 0) {
             Point pt = new Point();
             pt.x = ((start_x1 * end_y1 - start_y1 * end_x1) * (start_x2 - end_x2) - (start_x1 - end_x1) * (start_x2 * end_y2 - start_y2 * end_x2)) / denominator;
             pt.y = ((start_x1 * end_y1 - start_y1 * end_x1) * (start_y2 - end_y2) - (start_y1 - end_y1) * (start_x2 * end_y2 - start_y2 * end_x2)) / denominator;
             return pt;
-        }
-        else
+        } else
             return new Point(-1, -1);
     }
 
-    static boolean exists(ArrayList<Point> corners, Point pt){
-        for(int i=0; i<corners.size(); i++){
-            if(Math.sqrt(Math.pow(corners.get(i).x-pt.x, 2)+Math.pow(corners.get(i).y-pt.y, 2)) < 10){
+    static boolean exists(ArrayList<Point> corners, Point pt) {
+        for (int i = 0; i < corners.size(); i++) {
+            if (Math.sqrt(Math.pow(corners.get(i).x - pt.x, 2) + Math.pow(corners.get(i).y - pt.y, 2)) < 10) {
                 return true;
             }
         }
         return false;
     }
 
-    static void sortCorners(ArrayList<Point> corners)
-    {
+    static void sortCorners(ArrayList<Point> corners) {
         ArrayList<Point> top, bottom;
 
         top = new ArrayList<Point>();
@@ -374,13 +369,12 @@ public class Test02Activity extends Activity {
 
         Point center = new Point();
 
-        for(int i=0; i<corners.size(); i++){
-            center.x += corners.get(i).x/corners.size();
-            center.y += corners.get(i).y/corners.size();
+        for (int i = 0; i < corners.size(); i++) {
+            center.x += corners.get(i).x / corners.size();
+            center.y += corners.get(i).y / corners.size();
         }
 
-        for (int i = 0; i < corners.size(); i++)
-        {
+        for (int i = 0; i < corners.size(); i++) {
             if (corners.get(i).y < center.y)
                 top.add(corners.get(i));
             else
@@ -388,7 +382,7 @@ public class Test02Activity extends Activity {
         }
         corners.clear();
 
-        if (top.size() == 2 && bottom.size() == 2){
+        if (top.size() == 2 && bottom.size() == 2) {
             Point top_left = top.get(0).x > top.get(1).x ? top.get(1) : top.get(0);
             Point top_right = top.get(0).x > top.get(1).x ? top.get(0) : top.get(1);
             Point bottom_left = bottom.get(0).x > bottom.get(1).x ? bottom.get(1) : bottom.get(0);
@@ -413,9 +407,9 @@ public class Test02Activity extends Activity {
         }
     }
 
-    private static int calcScaleFactor(int rows, int cols){
+    private static int calcScaleFactor(int rows, int cols) {
         int idealRow, idealCol;
-        if(rows<cols){
+        if (rows < cols) {
             idealRow = 240;
             idealCol = 320;
         } else {
@@ -423,7 +417,7 @@ public class Test02Activity extends Activity {
             idealRow = 320;
         }
         int val = Math.min(rows / idealRow, cols / idealCol);
-        if(val<=0){
+        if (val <= 0) {
             return 1;
         } else {
             return val;
