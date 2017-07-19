@@ -1,6 +1,19 @@
 package com.xqs.cvdemo.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.util.Log;
+
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by xiaoqingsong
@@ -62,5 +75,78 @@ public class ImageUtil {
             }
         }
         return yuv;
+    }
+
+    public static Mat contours(Mat originalMat) {
+
+        Mat grayMat = new Mat();
+        Mat cannyEdges = new Mat();
+        Mat hierarchy = new Mat();
+
+        List<MatOfPoint> contourList = new ArrayList<MatOfPoint>(); //A list to store all the contours
+
+        //Converting the image to grayscale
+        Imgproc.cvtColor(originalMat, grayMat, Imgproc.COLOR_BGR2GRAY);
+
+        Imgproc.Canny(originalMat, cannyEdges, 80, 200);
+
+        //finding contours
+        Imgproc.findContours(cannyEdges, contourList, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        //Drawing contours on a new image
+        Mat contours = new Mat();
+        contours.create(cannyEdges.rows(), cannyEdges.cols(), CvType.CV_8UC3);
+        Random r = new Random();
+        for (int i = 0; i < contourList.size(); i++)
+
+        {
+            Log.w("contours","is drawing---"+i+" in "+contourList.size());
+            Imgproc.drawContours(contours, contourList, i, new Scalar(r.nextInt(255), r.nextInt(255), r.nextInt(255)), -1);
+        }
+        return contours;
+    }
+
+    public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
+
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                return bitmap;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.setScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.setRotate(180);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.setRotate(90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return bitmap;
+        }
+        try {
+            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            bitmap.recycle();
+            return bmRotated;
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 }

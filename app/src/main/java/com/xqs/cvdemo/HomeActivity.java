@@ -19,6 +19,7 @@ public class HomeActivity extends Activity {
     private Button mBtn02;
     private Button mBtn03;
     private Button mBtn04;
+    private Button mBtn05;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,6 +30,7 @@ public class HomeActivity extends Activity {
         mBtn02 = (Button)findViewById(R.id.btn_02);
         mBtn03 = (Button)findViewById(R.id.btn_03);
         mBtn04 = (Button)findViewById(R.id.btn_04);
+        mBtn05 = (Button)findViewById(R.id.btn_05);
 
         mBtn01.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,6 +57,12 @@ public class HomeActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(HomeActivity.this,Test03Activity.class));
+            }
+        });
+        mBtn05.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this,Test04Activity.class));
             }
         });
 
